@@ -1,14 +1,14 @@
-# Solicitamos al usuario que ingrese el número
+# Solicitamos la clave al usuario
 numero = int(input("Por favor, ingresa el número (clave): "))
 
-# Abrimos la imagen encriptada y la convertimos a bytes
+# Leemos la imagen encriptada y la convertimos a bytes
 with open("imagen_encriptada.jpg", "rb") as file:
     image = bytearray(file.read())
 
-# Aplicamos la operación XOR a cada byte de la imagen para desencriptarla
+# Desencriptamos la imagen
 for i, j in enumerate(image):
     image[i] = j ^ numero
 
-# Guardamos la imagen desencriptada en un archivo llamado "decrypted.jpg"
+# Guardamos la imagen desencriptada
 with open("decrypted.jpg", "wb") as file:
     file.write(image)
