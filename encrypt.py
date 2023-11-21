@@ -1,27 +1,28 @@
 # Importamos las bibliotecas necesarias
-from cryptography.fernet import Fernet  # Biblioteca para cifrado simétrico
-import base64  # Para codificación y decodificación en base64
-from PIL import Image  # Biblioteca para manipulación de imágenes
-import io  # Para trabajar con streams de bytes
-import hashlib  # Para generar hash de la clave
+import os  # Para obtener la extensión de la imagen
 
 # Solicitamos al usuario que ingrese la ruta de la imagen y el número
 ruta_imagen = input("Por favor, ingresa la ruta de la imagen: ")
-numero = input("Por favor, ingresa un número: ")
 
-# Generamos una clave de encriptación a partir del número
-clave = base64.urlsafe_b64encode(hashlib.sha256(numero.encode()).digest())
-cifrado = Fernet(clave)  # Creamos un objeto Fernet con la clave generada
+# Obtenemos la extensión de la imagen
+extension = os.path.splitext(ruta_imagen)[1].upper()
+
+# Verificamos si la extensión es válida
+while extension not in [".JPEG", ".PNG", ".JPG"]:
+    print("Por favor, ingresa una imagen con extensión .JPEG, .PNG o .JPG.")
+    ruta_imagen = input("Por favor, ingresa la ruta de la imagen: ")
+    extension = os.path.splitext(ruta_imagen)[1].upper()
+
+numero = int(input("Por favor, ingresa un número: "))
 
 # Abrimos la imagen y la convertimos a bytes
-imagen = Image.open(ruta_imagen)
-byte_arr = io.BytesIO()
-imagen.save(byte_arr, format="JPEG")  # Guardamos la imagen en un stream de bytes en formato JPEG
-imagen_en_bytes = byte_arr.getvalue()
+with open(ruta_imagen, 'rb') as file:
+    image = bytearray(file.read())
 
-# Encriptamos la imagen utilizando la clave generada
-imagen_encriptada = cifrado.encrypt(imagen_en_bytes)
+# Aplicamos la operación XOR a cada byte de la imagen
+for i, j in enumerate(image):
+    image[i] = j ^ numero
 
-# Guardamos la imagen encriptada en un archivo llamado "imagen_encriptada"
-with open("imagen_encriptada", "wb") as f:
-    f.write(imagen_encriptada)
+# Guardamos la imagen encriptada en un archivo llamado "imagen_encriptada.jpg"
+with open("imagen_encriptada.jpg", 'wb') as file:
+    file.write(image)
